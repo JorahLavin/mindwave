@@ -937,6 +937,48 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(console.warn);
 }
 
+// ─────────────────────────────────────────────
+//  WAKE LOCK
+// ─────────────────────────────────────────────
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+  } catch (e) {
+    console.warn('Wake lock denied:', e);
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    try { await wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+
+// Re-acquire wake lock and resume audio context when app returns to foreground
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && isPlaying) {
+    await requestWakeLock();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+});
+
+// Patch orb button to manage wake lock alongside play/stop
+document.getElementById('orbBtn').removeEventListener('click', togglePlay);
+document.getElementById('orbBtn').addEventListener('click', async () => {
+  togglePlay();
+  if (isPlaying) {
+    await requestWakeLock();
+  } else {
+    await releaseWakeLock();
+  }
+});
+
 // Init timer display
 timerRemaining = sessionMinutes * 60;
 updateTimerDisplay();
