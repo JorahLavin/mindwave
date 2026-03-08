@@ -21,8 +21,6 @@
       --accent:    #4fc3f7;
       --glow:      rgba(79, 195, 247, 0.15);
       --warn:      #f0a070;
-
-      /* mode colors */
       --c-focus:   #4fc3f7;
       --c-flow:    #81c784;
       --c-relax:   #ce93d8;
@@ -49,11 +47,12 @@
     header {
       width: 100%;
       max-width: 480px;
-      padding: 2rem 0 1rem;
+      padding: 1.75rem 0 0.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.2rem;
+      position: relative;
     }
 
     .wordmark {
@@ -72,9 +71,19 @@
       text-transform: uppercase;
     }
 
+    .version-badge {
+      position: absolute;
+      top: 1.75rem;
+      right: 0;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
     /* --- Warning badge --- */
     .headphone-note {
-      margin-top: 1rem;
+      margin-top: 0.75rem;
       width: 100%;
       max-width: 480px;
       background: rgba(240, 160, 112, 0.08);
@@ -91,7 +100,7 @@
 
     /* --- Mode selector --- */
     .modes {
-      margin-top: 1.75rem;
+      margin-top: 1.5rem;
       width: 100%;
       max-width: 480px;
       display: grid;
@@ -115,29 +124,15 @@
 
     .mode-btn:hover { border-color: var(--muted); }
 
-    .mode-icon {
-      font-size: 1.3rem;
-    }
+    .mode-icon  { font-size: 1.3rem; }
+    .mode-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+    .mode-hz    { font-size: 0.55rem; color: var(--muted); letter-spacing: 0.05em; }
 
-    .mode-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .mode-hz {
-      font-size: 0.55rem;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-    }
-
-    /* Active mode button */
-    .mode-btn.active[data-mode="focus"]   { border-color: var(--c-focus);   background: rgba(79,195,247,0.08); }
-    .mode-btn.active[data-mode="flow"]    { border-color: var(--c-flow);    background: rgba(129,199,132,0.08); }
-    .mode-btn.active[data-mode="relax"]   { border-color: var(--c-relax);   background: rgba(206,147,216,0.08); }
-    .mode-btn.active[data-mode="sleep"]   { border-color: var(--c-sleep);   background: rgba(92,107,192,0.08); }
-    .mode-btn.active[data-mode="meditate"]{ border-color: var(--c-meditate);background: rgba(255,183,77,0.08); }
+    .mode-btn.active[data-mode="focus"]    { border-color: var(--c-focus);    background: rgba(79,195,247,0.08); }
+    .mode-btn.active[data-mode="flow"]     { border-color: var(--c-flow);     background: rgba(129,199,132,0.08); }
+    .mode-btn.active[data-mode="relax"]    { border-color: var(--c-relax);    background: rgba(206,147,216,0.08); }
+    .mode-btn.active[data-mode="sleep"]    { border-color: var(--c-sleep);    background: rgba(92,107,192,0.08); }
+    .mode-btn.active[data-mode="meditate"] { border-color: var(--c-meditate); background: rgba(255,183,77,0.08); }
 
     .mode-btn.active .mode-label { color: var(--text); }
     .mode-btn.active[data-mode="focus"]    .mode-label { color: var(--c-focus); }
@@ -148,7 +143,7 @@
 
     /* --- Orb --- */
     .orb-wrap {
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       position: relative;
       width: 180px;
       height: 180px;
@@ -165,19 +160,14 @@
       transition: border-color 0.6s ease;
     }
 
-    .orb-ring.pulse {
-      animation: ringPulse 3s ease-in-out infinite;
-    }
+    .orb-ring.pulse { animation: ringPulse 3s ease-in-out infinite; }
 
     .orb-ring-outer {
       inset: -16px;
       border-color: transparent;
-      animation: none;
     }
 
-    .orb-ring-outer.pulse {
-      animation: outerPulse 3s ease-in-out infinite 0.4s;
-    }
+    .orb-ring-outer.pulse { animation: outerPulse 3s ease-in-out infinite 0.4s; }
 
     @keyframes ringPulse {
       0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -208,15 +198,16 @@
       box-shadow: 0 0 40px rgba(0,0,0,0.6);
       -webkit-tap-highlight-color: transparent;
       gap: 0.2rem;
+      overflow: hidden;
     }
 
-    .orb:hover {
-      transform: scale(1.03);
-    }
+    .orb:hover { transform: scale(1.03); }
 
     .orb-play-icon {
       font-size: 1.6rem;
       transition: opacity 0.3s;
+      position: relative;
+      z-index: 2;
     }
 
     .orb-status {
@@ -224,9 +215,24 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text-dim);
+      position: relative;
+      z-index: 2;
     }
 
-    /* Playing state orb */
+    /* Waveform canvas inside orb */
+    #waveCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      z-index: 1;
+    }
+
+    body.playing #waveCanvas { opacity: 1; }
+
     body.playing .orb {
       box-shadow: 0 0 60px var(--glow), 0 0 20px var(--glow);
     }
@@ -235,7 +241,7 @@
 
     /* --- Timer --- */
     .timer-section {
-      margin-top: 1.75rem;
+      margin-top: 1.5rem;
       width: 100%;
       max-width: 480px;
     }
@@ -293,13 +299,11 @@
       letter-spacing: 0.05em;
       color: var(--text);
       line-height: 1;
+      transition: color 0.4s;
     }
 
-    .timer-digits.counting {
-      color: var(--accent);
-    }
+    .timer-digits.counting { color: var(--accent); }
 
-    /* Timer progress bar */
     .timer-bar-wrap {
       margin-top: 0.5rem;
       height: 2px;
@@ -313,12 +317,11 @@
       background: var(--accent);
       width: 0%;
       transition: width 1s linear, background 0.5s;
-      transform-origin: left;
     }
 
     /* --- Mix controls --- */
     .mix-section {
-      margin-top: 1.75rem;
+      margin-top: 1.5rem;
       width: 100%;
       max-width: 480px;
     }
@@ -331,17 +334,9 @@
       margin-bottom: 0.75rem;
     }
 
-    .mix-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+    .mix-controls { display: flex; flex-direction: column; gap: 0.75rem; }
 
-    .mix-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .mix-row { display: flex; align-items: center; gap: 0.75rem; }
 
     .mix-row-label {
       font-size: 0.65rem;
@@ -370,22 +365,11 @@
       transition: transform 0.15s;
     }
 
-    input[type=range]::-webkit-slider-thumb:hover {
-      transform: scale(1.3);
-    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
 
-    .mix-val {
-      font-size: 0.62rem;
-      color: var(--text-dim);
-      width: 28px;
-      text-align: right;
-    }
+    .mix-val { font-size: 0.62rem; color: var(--text-dim); width: 28px; text-align: right; }
 
-    /* Noise type selector */
-    .noise-types {
-      display: flex;
-      gap: 0.4rem;
-    }
+    .noise-types { display: flex; gap: 0.4rem; }
 
     .noise-type-btn {
       background: var(--surface);
@@ -402,12 +386,9 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .noise-type-btn.active {
-      border-color: var(--accent);
-      color: var(--text);
-    }
+    .noise-type-btn.active { border-color: var(--accent); color: var(--text); }
 
-    /* --- Mode info strip --- */
+    /* --- Mode info --- */
     .mode-info {
       margin-top: 1.5rem;
       width: 100%;
@@ -422,23 +403,34 @@
       letter-spacing: 0.04em;
     }
 
-    .mode-info strong {
-      color: var(--text);
-      font-weight: 400;
+    .mode-info strong { color: var(--text); font-weight: 400; }
+
+    /* --- Sleep volume ramp indicator --- */
+    .sleep-ramp-note {
+      display: none;
+      margin-top: 0.5rem;
+      width: 100%;
+      max-width: 480px;
+      font-size: 0.6rem;
+      color: var(--c-sleep);
+      letter-spacing: 0.08em;
+      text-align: center;
+      opacity: 0.7;
     }
 
-    /* --- Footer note --- */
+    body.mode-sleep.playing .sleep-ramp-note { display: block; }
+
+    /* --- Footer --- */
     .footer {
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       font-size: 0.58rem;
       color: var(--muted);
       letter-spacing: 0.1em;
       text-align: center;
     }
 
-    /* Responsiveness */
     @media (max-width: 360px) {
-      .modes { grid-template-columns: repeat(5, 1fr); gap: 0.3rem; }
+      .modes { gap: 0.3rem; }
       .mode-btn { padding: 0.6rem 0.15rem; }
       .mode-icon { font-size: 1.1rem; }
     }
@@ -449,13 +441,13 @@
 <header>
   <div class="wordmark">Mindwave</div>
   <div class="tagline">Generative neural audio</div>
+  <div class="version-badge">v1.2</div>
 </header>
 
 <div class="headphone-note">
   ⚠ Headphones required — binaural beats rely on independent per-ear frequencies
 </div>
 
-<!-- Mode selector -->
 <div class="modes">
   <button class="mode-btn active" data-mode="focus">
     <span class="mode-icon">⚡</span>
@@ -484,17 +476,16 @@
   </button>
 </div>
 
-<!-- Orb -->
 <div class="orb-wrap">
   <div class="orb-ring orb-ring-outer" id="orbRingOuter"></div>
   <div class="orb-ring" id="orbRing"></div>
   <div class="orb" id="orbBtn">
+    <canvas id="waveCanvas"></canvas>
     <span class="orb-play-icon" id="orbIcon">▶</span>
     <span class="orb-status" id="orbStatus">tap to begin</span>
   </div>
 </div>
 
-<!-- Timer -->
 <div class="timer-section">
   <div class="timer-row">
     <span class="timer-label">Session</span>
@@ -514,7 +505,6 @@
   </div>
 </div>
 
-<!-- Mix -->
 <div class="mix-section">
   <div class="section-label">Mix</div>
   <div class="mix-controls">
@@ -544,163 +534,202 @@
   </div>
 </div>
 
-<!-- Mode info -->
-<div class="mode-info" id="modeInfo">
-  <strong>Beta / Focus (16 Hz)</strong> — promotes alertness and active concentration.
-  Best for analytical tasks, writing, and detail work.
-</div>
+<div class="mode-info" id="modeInfo"></div>
+<div class="sleep-ramp-note">Volume will fade gradually over your session</div>
 
 <div class="footer">No network required · All audio generated locally</div>
 
 <script>
 // ─────────────────────────────────────────────
-//  AUDIO ENGINE
+//  CONSTANTS & STATE
 // ─────────────────────────────────────────────
+const VERSION = '1.2';
+
 const MODES = {
-  focus:    { beat: 16, label: 'Beta / Focus',    hz: '16 Hz', desc: 'promotes alertness and active concentration. Best for analytical tasks, writing, and detail work.' },
-  flow:     { beat: 10, label: 'Alpha / Flow',    hz: '10 Hz', desc: 'relaxed alertness, light creative focus. Good for brainstorming, reading, and moderate-intensity work.' },
-  relax:    { beat: 7,  label: 'Alpha-Theta / Relax', hz: '7 Hz', desc: 'the boundary between relaxed waking and light trance. Good for unwinding, gentle reflection.' },
-  sleep:    { beat: 2,  label: 'Delta / Sleep',   hz: '2 Hz',  desc: 'deep sleep and restoration range. Use to wind down before bed or for deep rest.' },
-  meditate: { beat: 5,  label: 'Theta / Meditate',hz: '5 Hz',  desc: 'deep meditation and light dream state. Supports inward focus, visualization, and contemplation.' },
+  focus:    { beat: 16, label: 'Beta / Focus',         hz: '16 Hz', desc: 'promotes alertness and active concentration. Best for analytical tasks, writing, and detail work.',          defaultCarrier: 220 },
+  flow:     { beat: 10, label: 'Alpha / Flow',          hz: '10 Hz', desc: 'relaxed alertness, light creative focus. Good for brainstorming, reading, and moderate-intensity work.',    defaultCarrier: 200 },
+  relax:    { beat: 7,  label: 'Alpha-Theta / Relax',   hz: '7 Hz',  desc: 'the boundary between relaxed waking and light trance. Good for unwinding and gentle reflection.',          defaultCarrier: 180 },
+  sleep:    { beat: 2,  label: 'Delta / Sleep',         hz: '2 Hz',  desc: 'deep sleep and restoration range. Volume fades gradually over your session. Use to wind down before bed.',  defaultCarrier: 120 },
+  meditate: { beat: 5,  label: 'Theta / Meditate',      hz: '5 Hz',  desc: 'deep meditation and light dream state. Supports inward focus, visualization, and contemplation.',          defaultCarrier: 160 },
 };
 
-let audioCtx = null;
-let isPlaying = false;
-let currentMode = 'focus';
-let noiseType = 'brown';
+// Per-mode carrier memory (persisted across mode switches)
+const carrierMemory = {
+  focus: 220, flow: 200, relax: 180, sleep: 120, meditate: 160
+};
+
+let audioCtx     = null;
+let isPlaying    = false;
+let currentMode  = 'focus';
+let noiseType    = 'brown';
 let sessionMinutes = 30;
-let timerInterval = null;
+let timerInterval  = null;
 let timerRemaining = 0;
-let timerTotal = 0;
+let timerTotal     = 0;
 
-// Gain nodes (live)
+// Audio nodes
 let toneGainL = null, toneGainR = null, noiseGain = null;
-let masterGain = null;
-
-// Source nodes
+let masterGain = null, fadeGain = null;
 let oscL = null, oscR = null, noiseNode = null;
-let mergerNode = null;
 
+// Sleep volume ramp
+let sleepRampInterval = null;
+
+// Waveform animation
+let waveAnimId = null;
+let analyser   = null;
+
+// ─────────────────────────────────────────────
+//  AUDIO CONTEXT
+// ─────────────────────────────────────────────
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
 
-// Brown noise buffer — pre-generate once
+// ─────────────────────────────────────────────
+//  NOISE BUFFERS
+// ─────────────────────────────────────────────
 function makeBrownNoiseBuffer(ctx) {
-  const bufferSize = ctx.sampleRate * 4;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  let lastOut = 0;
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    data[i] = (lastOut + (0.02 * white)) / 1.02;
-    lastOut = data[i];
-    data[i] *= 3.5; // normalize
+  const len = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < len; i++) {
+    const w = Math.random() * 2 - 1;
+    d[i] = (last + 0.02 * w) / 1.02;
+    last = d[i];
+    d[i] *= 3.5;
   }
-  return buffer;
+  return buf;
 }
 
 function makePinkNoiseBuffer(ctx) {
-  const bufferSize = ctx.sampleRate * 4;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
+  const len = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
   let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    b0 = 0.99886 * b0 + white * 0.0555179;
-    b1 = 0.99332 * b1 + white * 0.0750759;
-    b2 = 0.96900 * b2 + white * 0.1538520;
-    b3 = 0.86650 * b3 + white * 0.3104856;
-    b4 = 0.55000 * b4 + white * 0.5329522;
-    b5 = -0.7616 * b5 - white * 0.0168980;
-    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-    b6 = white * 0.115926;
+  for (let i = 0; i < len; i++) {
+    const w = Math.random() * 2 - 1;
+    b0 = 0.99886*b0 + w*0.0555179; b1 = 0.99332*b1 + w*0.0750759;
+    b2 = 0.96900*b2 + w*0.1538520; b3 = 0.86650*b3 + w*0.3104856;
+    b4 = 0.55000*b4 + w*0.5329522; b5 = -0.7616*b5 - w*0.0168980;
+    d[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+    b6 = w * 0.115926;
   }
-  return buffer;
+  return buf;
 }
 
 function makeWhiteNoiseBuffer(ctx) {
-  const bufferSize = ctx.sampleRate * 4;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
-  return buffer;
+  const len = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.5;
+  return buf;
 }
 
 function getNoiseBuffer(ctx) {
-  if (noiseType === 'pink') return makePinkNoiseBuffer(ctx);
+  if (noiseType === 'pink')  return makePinkNoiseBuffer(ctx);
   if (noiseType === 'white') return makeWhiteNoiseBuffer(ctx);
   return makeBrownNoiseBuffer(ctx);
 }
+
+// ─────────────────────────────────────────────
+//  AUDIO START / STOP
+// ─────────────────────────────────────────────
+function getToneGain()  { return parseInt(document.getElementById('toneVol').value)  / 100 * 0.3; }
+function getNoiseGain() { return parseInt(document.getElementById('noiseVol').value) / 100 * 0.5; }
 
 function startAudio() {
   const ctx = getAudioCtx();
   if (ctx.state === 'suspended') ctx.resume();
 
+  // Master chain: fadeGain → masterGain → destination
   masterGain = ctx.createGain();
   masterGain.gain.value = 1.0;
+
+  fadeGain = ctx.createGain();
+  fadeGain.gain.value = 0; // start silent, ramp up
+  fadeGain.connect(masterGain);
   masterGain.connect(ctx.destination);
 
-  // Binaural tone setup
-  const carrier = parseInt(document.getElementById('carrierFreq').value) || 200;
-  const beat = MODES[currentMode].beat;
+  // Analyser for waveform
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  masterGain.connect(analyser);
 
-  mergerNode = ctx.createChannelMerger(2);
-  mergerNode.connect(masterGain);
+  // Binaural tones
+  const carrier = carrierMemory[currentMode];
+  const beat    = MODES[currentMode].beat;
 
-  // Left ear: carrier
+  const merger = ctx.createChannelMerger(2);
+  merger.connect(fadeGain);
+
   oscL = ctx.createOscillator();
   oscL.type = 'sine';
   oscL.frequency.value = carrier;
   toneGainL = ctx.createGain();
   toneGainL.gain.value = getToneGain();
   oscL.connect(toneGainL);
-  toneGainL.connect(mergerNode, 0, 0);
+  toneGainL.connect(merger, 0, 0);
   oscL.start();
 
-  // Right ear: carrier + beat
   oscR = ctx.createOscillator();
   oscR.type = 'sine';
   oscR.frequency.value = carrier + beat;
   toneGainR = ctx.createGain();
   toneGainR.gain.value = getToneGain();
   oscR.connect(toneGainR);
-  toneGainR.connect(mergerNode, 0, 1);
+  toneGainR.connect(merger, 0, 1);
   oscR.start();
 
-  // Noise — mono through splitter to both channels
-  const noiseBuf = getNoiseBuffer(ctx);
+  // Noise
+  const noiseBuf  = getNoiseBuffer(ctx);
   noiseNode = ctx.createBufferSource();
   noiseNode.buffer = noiseBuf;
   noiseNode.loop = true;
   noiseGain = ctx.createGain();
   noiseGain.gain.value = getNoiseGain();
-
-  // Spread mono noise to both channels
-  const splitter = ctx.createChannelSplitter(1);
   const noiseMerger = ctx.createChannelMerger(2);
   noiseNode.connect(noiseGain);
   noiseGain.connect(noiseMerger, 0, 0);
   noiseGain.connect(noiseMerger, 0, 1);
-  noiseMerger.connect(masterGain);
+  noiseMerger.connect(fadeGain);
   noiseNode.start();
+
+  // Fade in over 2.5s
+  fadeGain.gain.setValueAtTime(0, ctx.currentTime);
+  fadeGain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 2.5);
+
+  // Start sleep volume ramp if in sleep mode
+  startSleepRampIfNeeded();
+
+  // Start waveform animation
+  startWaveform();
 }
 
-function stopAudio() {
-  if (oscL)     { try { oscL.stop(); }     catch(e){} oscL = null; }
-  if (oscR)     { try { oscR.stop(); }     catch(e){} oscR = null; }
-  if (noiseNode){ try { noiseNode.stop(); } catch(e){} noiseNode = null; }
-  toneGainL = null; toneGainR = null; noiseGain = null;
-  masterGain = null; mergerNode = null;
-}
+function stopAudio(instant = false) {
+  stopSleepRamp();
+  stopWaveform();
 
-function getToneGain() {
-  return parseInt(document.getElementById('toneVol').value) / 100 * 0.3;
-}
+  const doStop = () => {
+    if (oscL)     { try { oscL.stop(); }      catch(e){} oscL = null; }
+    if (oscR)     { try { oscR.stop(); }      catch(e){} oscR = null; }
+    if (noiseNode){ try { noiseNode.stop(); } catch(e){} noiseNode = null; }
+    toneGainL = null; toneGainR = null; noiseGain = null;
+    masterGain = null; fadeGain = null; analyser = null;
+  };
 
-function getNoiseGain() {
-  return parseInt(document.getElementById('noiseVol').value) / 100 * 0.5;
+  if (instant || !fadeGain || !audioCtx) {
+    doStop();
+  } else {
+    // Fade out over 2s then stop
+    const ctx = audioCtx;
+    fadeGain.gain.cancelScheduledValues(ctx.currentTime);
+    fadeGain.gain.setValueAtTime(fadeGain.gain.value, ctx.currentTime);
+    fadeGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 2.0);
+    setTimeout(doStop, 2200);
+  }
 }
 
 function updateToneGain() {
@@ -713,22 +742,52 @@ function updateNoiseGain() {
   if (noiseGain) noiseGain.gain.value = getNoiseGain();
 }
 
-// Bowl strike end-of-session tone
+// ─────────────────────────────────────────────
+//  SLEEP VOLUME RAMP
+// ─────────────────────────────────────────────
+function startSleepRampIfNeeded() {
+  stopSleepRamp();
+  if (currentMode !== 'sleep' || sessionMinutes === 0) return;
+
+  // Ramp master volume from 1.0 down to 0.15 over the session
+  const totalMs   = sessionMinutes * 60 * 1000;
+  const stepMs    = 5000; // every 5 seconds
+  const steps     = totalMs / stepMs;
+  const startGain = 1.0;
+  const endGain   = 0.15;
+  let   step      = 0;
+
+  sleepRampInterval = setInterval(() => {
+    if (!masterGain || !isPlaying) { stopSleepRamp(); return; }
+    step++;
+    const t = Math.min(step / steps, 1);
+    masterGain.gain.value = startGain + (endGain - startGain) * t;
+  }, stepMs);
+}
+
+function stopSleepRamp() {
+  if (sleepRampInterval) { clearInterval(sleepRampInterval); sleepRampInterval = null; }
+  if (masterGain) masterGain.gain.value = 1.0;
+}
+
+// ─────────────────────────────────────────────
+//  BOWL CUE
+// ─────────────────────────────────────────────
 function playBowlCue() {
   const ctx = getAudioCtx();
   const g = ctx.createGain();
   g.connect(ctx.destination);
 
-  const osc = ctx.createOscillator();
+  const osc  = ctx.createOscillator();
   osc.type = 'sine';
   osc.frequency.value = 432;
   osc.connect(g);
 
+  const g2   = ctx.createGain();
+  g2.gain.value = 0.3;
   const osc2 = ctx.createOscillator();
   osc2.type = 'sine';
-  osc2.frequency.value = 864; // octave harmonic
-  const g2 = ctx.createGain();
-  g2.gain.value = 0.3;
+  osc2.frequency.value = 864;
   osc2.connect(g2);
   g2.connect(g);
 
@@ -737,10 +796,72 @@ function playBowlCue() {
   g.gain.linearRampToValueAtTime(0.4, now + 0.05);
   g.gain.exponentialRampToValueAtTime(0.001, now + 4.0);
 
-  osc.start(now);
-  osc2.start(now);
-  osc.stop(now + 4.5);
-  osc2.stop(now + 4.5);
+  osc.start(now);  osc.stop(now + 4.5);
+  osc2.start(now); osc2.stop(now + 4.5);
+}
+
+// ─────────────────────────────────────────────
+//  WAVEFORM ANIMATION
+// ─────────────────────────────────────────────
+function startWaveform() {
+  const canvas = document.getElementById('waveCanvas');
+  const ctx2   = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+
+  const accentColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--accent').trim();
+
+  function draw() {
+    if (!analyser) return;
+    waveAnimId = requestAnimationFrame(draw);
+
+    const w = canvas.width, h = canvas.height;
+    const bufLen = analyser.frequencyBinCount;
+    const data   = new Uint8Array(bufLen);
+    analyser.getByteTimeDomainData(data);
+
+    ctx2.clearRect(0, 0, w, h);
+
+    // Circular clip
+    ctx2.save();
+    ctx2.beginPath();
+    ctx2.arc(w/2, h/2, Math.min(w,h)/2, 0, Math.PI*2);
+    ctx2.clip();
+
+    ctx2.lineWidth   = 1.5;
+    ctx2.strokeStyle = accentColor || '#4fc3f7';
+    ctx2.globalAlpha = 0.35;
+    ctx2.beginPath();
+
+    const sliceW = w / bufLen;
+    let x = 0;
+    for (let i = 0; i < bufLen; i++) {
+      const v = data[i] / 128.0;
+      const y = (v * h) / 2;
+      if (i === 0) ctx2.moveTo(x, y);
+      else         ctx2.lineTo(x, y);
+      x += sliceW;
+    }
+    ctx2.lineTo(w, h/2);
+    ctx2.stroke();
+    ctx2.restore();
+  }
+
+  draw();
+}
+
+function stopWaveform() {
+  if (waveAnimId) { cancelAnimationFrame(waveAnimId); waveAnimId = null; }
+  const canvas = document.getElementById('waveCanvas');
+  if (canvas) {
+    const ctx2 = canvas.getContext('2d');
+    ctx2.clearRect(0, 0, canvas.width, canvas.height);
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -753,7 +874,7 @@ function startTimer() {
     updateTimerDisplay();
     return;
   }
-  timerTotal = sessionMinutes * 60;
+  timerTotal     = sessionMinutes * 60;
   timerRemaining = timerTotal;
   updateTimerDisplay();
 
@@ -764,22 +885,21 @@ function startTimer() {
     if (timerRemaining <= 0) {
       clearInterval(timerInterval);
       playBowlCue();
-      setTimeout(() => togglePlay(), 4500);
+      setTimeout(() => { if (isPlaying) togglePlay(); }, 4500);
     }
   }, 1000);
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-}
+function stopTimer() { clearInterval(timerInterval); }
 
 function updateTimerDisplay() {
-  const el = document.getElementById('timerDigits');
+  const el  = document.getElementById('timerDigits');
   const bar = document.getElementById('timerBar');
 
-  if (timerRemaining === Infinity || sessionMinutes === 0) {
+  if (!isFinite(timerRemaining) || sessionMinutes === 0) {
     el.textContent = '∞';
     bar.style.width = '0%';
+    el.classList.remove('counting');
     return;
   }
 
@@ -789,8 +909,7 @@ function updateTimerDisplay() {
 
   if (isPlaying && timerTotal > 0) {
     el.classList.add('counting');
-    const pct = ((timerTotal - timerRemaining) / timerTotal) * 100;
-    bar.style.width = pct + '%';
+    bar.style.width = ((timerTotal - timerRemaining) / timerTotal * 100) + '%';
   } else {
     el.classList.remove('counting');
     bar.style.width = '0%';
@@ -803,10 +922,10 @@ function updateTimerDisplay() {
 function togglePlay() {
   if (isPlaying) {
     isPlaying = false;
-    stopAudio();
+    stopAudio();        // fades out
     stopTimer();
-    document.body.classList.remove('playing');
-    document.getElementById('orbIcon').textContent = '▶';
+    document.body.classList.remove('playing', 'mode-' + currentMode);
+    document.getElementById('orbIcon').textContent   = '▶';
     document.getElementById('orbStatus').textContent = 'tap to begin';
     document.getElementById('orbRing').classList.remove('pulse');
     document.getElementById('orbRingOuter').classList.remove('pulse');
@@ -815,16 +934,19 @@ function togglePlay() {
     isPlaying = true;
     startAudio();
     startTimer();
-    document.body.classList.add('playing');
-    document.getElementById('orbIcon').textContent = '■';
+    document.body.classList.add('playing', 'mode-' + currentMode);
+    document.getElementById('orbIcon').textContent   = '■';
     document.getElementById('orbStatus').textContent = MODES[currentMode].hz;
     document.getElementById('orbRing').classList.add('pulse');
     document.getElementById('orbRingOuter').classList.add('pulse');
-    updateModeColor();
+    applyModeColor();
   }
 }
 
-function updateModeColor() {
+// ─────────────────────────────────────────────
+//  MODE COLOR
+// ─────────────────────────────────────────────
+function applyModeColor() {
   const colors = {
     focus: 'var(--c-focus)', flow: 'var(--c-flow)', relax: 'var(--c-relax)',
     sleep: 'var(--c-sleep)', meditate: 'var(--c-meditate)'
@@ -837,31 +959,87 @@ function updateModeColor() {
     meditate: 'rgba(255,183,77,0.18)',
   };
   document.documentElement.style.setProperty('--accent', colors[currentMode]);
-  document.documentElement.style.setProperty('--glow', glows[currentMode]);
+  document.documentElement.style.setProperty('--glow',   glows[currentMode]);
 }
+
+// ─────────────────────────────────────────────
+//  MODE INFO
+// ─────────────────────────────────────────────
+function updateModeInfo() {
+  const m = MODES[currentMode];
+  document.getElementById('modeInfo').innerHTML =
+    `<strong>${m.label} (${m.hz})</strong> — ${m.desc}`;
+}
+
+// ─────────────────────────────────────────────
+//  CARRIER SLIDER — sync to current mode memory
+// ─────────────────────────────────────────────
+function syncCarrierSlider() {
+  const val = carrierMemory[currentMode];
+  document.getElementById('carrierFreq').value = val;
+  document.getElementById('carrierFreqVal').textContent = val;
+}
+
+// ─────────────────────────────────────────────
+//  WAKE LOCK
+// ─────────────────────────────────────────────
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); }
+  catch(e) { console.warn('Wake lock denied:', e); }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) { try { await wakeLock.release(); } catch(e){} wakeLock = null; }
+}
+
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && isPlaying) {
+    await requestWakeLock();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+});
 
 // ─────────────────────────────────────────────
 //  UI EVENTS
 // ─────────────────────────────────────────────
-document.getElementById('orbBtn').addEventListener('click', togglePlay);
+
+// Orb — single listener
+document.getElementById('orbBtn').addEventListener('click', async () => {
+  togglePlay();
+  if (isPlaying) await requestWakeLock();
+  else           await releaseWakeLock();
+});
 
 // Mode buttons
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    // Save current carrier before switching
+    carrierMemory[currentMode] = parseInt(document.getElementById('carrierFreq').value);
+
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+
+    // Update body class for sleep ramp note
+    document.body.classList.remove('mode-' + currentMode);
     currentMode = btn.dataset.mode;
+    if (isPlaying) document.body.classList.add('mode-' + currentMode);
+
+    // Sync carrier slider to this mode's memory
+    syncCarrierSlider();
     updateModeInfo();
 
     if (isPlaying) {
-      // Hot-swap oscillator frequencies
+      const carrier = carrierMemory[currentMode];
       if (oscL && oscR) {
-        const carrier = parseInt(document.getElementById('carrierFreq').value) || 200;
         oscL.frequency.setTargetAtTime(carrier, audioCtx.currentTime, 0.1);
         oscR.frequency.setTargetAtTime(carrier + MODES[currentMode].beat, audioCtx.currentTime, 0.1);
       }
       document.getElementById('orbStatus').textContent = MODES[currentMode].hz;
-      updateModeColor();
+      applyModeColor();
+      startSleepRampIfNeeded();
     }
   });
 });
@@ -879,7 +1057,7 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
   });
 });
 
-// Volume sliders
+// Mix sliders
 document.getElementById('toneVol').addEventListener('input', function() {
   document.getElementById('toneVolVal').textContent = this.value;
   updateToneGain();
@@ -891,11 +1069,12 @@ document.getElementById('noiseVol').addEventListener('input', function() {
 });
 
 document.getElementById('carrierFreq').addEventListener('input', function() {
-  document.getElementById('carrierFreqVal').textContent = this.value;
+  const val = parseInt(this.value);
+  document.getElementById('carrierFreqVal').textContent = val;
+  carrierMemory[currentMode] = val;  // save to memory
   if (isPlaying && oscL && oscR) {
-    const carrier = parseInt(this.value);
-    oscL.frequency.setTargetAtTime(carrier, audioCtx.currentTime, 0.05);
-    oscR.frequency.setTargetAtTime(carrier + MODES[currentMode].beat, audioCtx.currentTime, 0.05);
+    oscL.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+    oscR.frequency.setTargetAtTime(val + MODES[currentMode].beat, audioCtx.currentTime, 0.05);
   }
 });
 
@@ -906,80 +1085,32 @@ document.querySelectorAll('.noise-type-btn').forEach(btn => {
     btn.classList.add('active');
     noiseType = btn.dataset.noise;
     if (isPlaying) {
-      // Rebuild noise source live
       const ctx = getAudioCtx();
       if (noiseNode) { try { noiseNode.stop(); } catch(e){} }
-      const noiseBuf = getNoiseBuffer(ctx);
       noiseNode = ctx.createBufferSource();
-      noiseNode.buffer = noiseBuf;
+      noiseNode.buffer = getNoiseBuffer(ctx);
       noiseNode.loop = true;
-      if (noiseGain) {
+      if (noiseGain && fadeGain) {
         noiseNode.connect(noiseGain);
-        const noiseMerger = ctx.createChannelMerger(2);
-        noiseGain.connect(noiseMerger, 0, 0);
-        noiseGain.connect(noiseMerger, 0, 1);
-        noiseMerger.connect(masterGain);
+        const nm = ctx.createChannelMerger(2);
+        noiseGain.connect(nm, 0, 0);
+        noiseGain.connect(nm, 0, 1);
+        nm.connect(fadeGain);
       }
       noiseNode.start();
     }
   });
 });
 
-// Mode info
-function updateModeInfo() {
-  const m = MODES[currentMode];
-  document.getElementById('modeInfo').innerHTML =
-    `<strong>${m.label} (${m.hz})</strong> — ${m.desc}`;
-}
-
-// Register service worker
+// Service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(console.warn);
 }
 
 // ─────────────────────────────────────────────
-//  WAKE LOCK
+//  INIT
 // ─────────────────────────────────────────────
-let wakeLock = null;
-
-async function requestWakeLock() {
-  if (!('wakeLock' in navigator)) return;
-  try {
-    wakeLock = await navigator.wakeLock.request('screen');
-  } catch (e) {
-    console.warn('Wake lock denied:', e);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock) {
-    try { await wakeLock.release(); } catch(e) {}
-    wakeLock = null;
-  }
-}
-
-// Re-acquire wake lock and resume audio context when app returns to foreground
-document.addEventListener('visibilitychange', async () => {
-  if (document.visibilityState === 'visible' && isPlaying) {
-    await requestWakeLock();
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }
-});
-
-// Patch orb button to manage wake lock alongside play/stop
-document.getElementById('orbBtn').removeEventListener('click', togglePlay);
-document.getElementById('orbBtn').addEventListener('click', async () => {
-  togglePlay();
-  if (isPlaying) {
-    await requestWakeLock();
-  } else {
-    await releaseWakeLock();
-  }
-});
-
-// Init timer display
+syncCarrierSlider();
 timerRemaining = sessionMinutes * 60;
 updateTimerDisplay();
 updateModeInfo();

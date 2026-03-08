@@ -1,4 +1,4 @@
-const CACHE = 'mindwave-v1';
+const CACHE = 'mindwave-v3';
 const ASSETS = [
   './',
   './index.html',
