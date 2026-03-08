@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mindwave</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0e14;
+      --surface:   #111722;
+      --border:    #1e2a3a;
+      --muted:     #3a4a5e;
+      --text:      #c8d8e8;
+      --text-dim:  #5a7080;
+      --accent:    #4fc3f7;
+      --glow:      rgba(79, 195, 247, 0.15);
+      --warn:      #f0a070;
+
+      /* mode colors */
+      --c-focus:   #4fc3f7;
+      --c-flow:    #81c784;
+      --c-relax:   #ce93d8;
+      --c-sleep:   #5c6bc0;
+      --c-meditate:#ffb74d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 1rem 2rem;
+      overflow-x: hidden;
+    }
+
+    /* --- Header --- */
+    header {
+      width: 100%;
+      max-width: 480px;
+      padding: 2rem 0 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+    }
+
+    .tagline {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* --- Warning badge --- */
+    .headphone-note {
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 480px;
+      background: rgba(240, 160, 112, 0.08);
+      border: 1px solid rgba(240, 160, 112, 0.25);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.68rem;
+      color: var(--warn);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* --- Mode selector --- */
+    .modes {
+      margin-top: 1.75rem;
+      width: 100%;
+      max-width: 480px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mode-btn:hover { border-color: var(--muted); }
+
+    .mode-icon {
+      font-size: 1.3rem;
+    }
+
+    .mode-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .mode-hz {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Active mode button */
+    .mode-btn.active[data-mode="focus"]   { border-color: var(--c-focus);   background: rgba(79,195,247,0.08); }
+    .mode-btn.active[data-mode="flow"]    { border-color: var(--c-flow);    background: rgba(129,199,132,0.08); }
+    .mode-btn.active[data-mode="relax"]   { border-color: var(--c-relax);   background: rgba(206,147,216,0.08); }
+    .mode-btn.active[data-mode="sleep"]   { border-color: var(--c-sleep);   background: rgba(92,107,192,0.08); }
+    .mode-btn.active[data-mode="meditate"]{ border-color: var(--c-meditate);background: rgba(255,183,77,0.08); }
+
+    .mode-btn.active .mode-label { color: var(--text); }
+    .mode-btn.active[data-mode="focus"]    .mode-label { color: var(--c-focus); }
+    .mode-btn.active[data-mode="flow"]     .mode-label { color: var(--c-flow); }
+    .mode-btn.active[data-mode="relax"]    .mode-label { color: var(--c-relax); }
+    .mode-btn.active[data-mode="sleep"]    .mode-label { color: var(--c-sleep); }
+    .mode-btn.active[data-mode="meditate"] .mode-label { color: var(--c-meditate); }
+
+    /* --- Orb --- */
+    .orb-wrap {
+      margin-top: 2rem;
+      position: relative;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orb-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      transition: border-color 0.6s ease;
+    }
+
+    .orb-ring.pulse {
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    .orb-ring-outer {
+      inset: -16px;
+      border-color: transparent;
+      animation: none;
+    }
+
+    .orb-ring-outer.pulse {
+      animation: outerPulse 3s ease-in-out infinite 0.4s;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50%       { opacity: 0.8; transform: scale(1.02); }
+    }
+
+    @keyframes outerPulse {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50%       { opacity: 0.25; transform: scale(1.04); }
+    }
+
+    .orb {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 36%,
+        rgba(255,255,255,0.06) 0%,
+        var(--surface) 60%,
+        var(--bg) 100%);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      -webkit-tap-highlight-color: transparent;
+      gap: 0.2rem;
+    }
+
+    .orb:hover {
+      transform: scale(1.03);
+    }
+
+    .orb-play-icon {
+      font-size: 1.6rem;
+      transition: opacity 0.3s;
+    }
+
+    .orb-status {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* Playing state orb */
+    body.playing .orb {
+      box-shadow: 0 0 60px var(--glow), 0 0 20px var(--glow);
+    }
+
+    body.playing .orb-ring { border-color: var(--accent); }
+
+    /* --- Timer --- */
+    .timer-section {
+      margin-top: 1.75rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .timer-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .timer-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .timer-presets {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .preset-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .preset-btn:hover, .preset-btn.active {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .timer-display {
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+
+    .timer-digits {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .timer-digits.counting {
+      color: var(--accent);
+    }
+
+    /* Timer progress bar */
+    .timer-bar-wrap {
+      margin-top: 0.5rem;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 1s linear, background 0.5s;
+      transform-origin: left;
+    }
+
+    /* --- Mix controls --- */
+    .mix-section {
+      margin-top: 1.75rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .mix-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mix-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mix-row-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+    }
+
+    .mix-val {
+      font-size: 0.62rem;
+      color: var(--text-dim);
+      width: 28px;
+      text-align: right;
+    }
+
+    /* Noise type selector */
+    .noise-types {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .noise-type-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .noise-type-btn.active {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* --- Mode info strip --- */
+    .mode-info {
+      margin-top: 1.5rem;
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.65rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+    }
+
+    .mode-info strong {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    /* --- Footer note --- */
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.58rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 360px) {
+      .modes { grid-template-columns: repeat(5, 1fr); gap: 0.3rem; }
+      .mode-btn { padding: 0.6rem 0.15rem; }
+      .mode-icon { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Mindwave</div>
+  <div class="tagline">Generative neural audio</div>
+</header>
+
+<div class="headphone-note">
+  ⚠ Headphones required — binaural beats rely on independent per-ear frequencies
+</div>
+
+<!-- Mode selector -->
+<div class="modes">
+  <button class="mode-btn active" data-mode="focus">
+    <span class="mode-icon">⚡</span>
+    <span class="mode-label">Focus</span>
+    <span class="mode-hz">16 Hz</span>
+  </button>
+  <button class="mode-btn" data-mode="flow">
+    <span class="mode-icon">🌊</span>
+    <span class="mode-label">Flow</span>
+    <span class="mode-hz">10 Hz</span>
+  </button>
+  <button class="mode-btn" data-mode="relax">
+    <span class="mode-icon">🍃</span>
+    <span class="mode-label">Relax</span>
+    <span class="mode-hz">7 Hz</span>
+  </button>
+  <button class="mode-btn" data-mode="sleep">
+    <span class="mode-icon">🌙</span>
+    <span class="mode-label">Sleep</span>
+    <span class="mode-hz">2 Hz</span>
+  </button>
+  <button class="mode-btn" data-mode="meditate">
+    <span class="mode-icon">◎</span>
+    <span class="mode-label">Meditate</span>
+    <span class="mode-hz">5 Hz</span>
+  </button>
+</div>
+
+<!-- Orb -->
+<div class="orb-wrap">
+  <div class="orb-ring orb-ring-outer" id="orbRingOuter"></div>
+  <div class="orb-ring" id="orbRing"></div>
+  <div class="orb" id="orbBtn">
+    <span class="orb-play-icon" id="orbIcon">▶</span>
+    <span class="orb-status" id="orbStatus">tap to begin</span>
+  </div>
+</div>
+
+<!-- Timer -->
+<div class="timer-section">
+  <div class="timer-row">
+    <span class="timer-label">Session</span>
+    <div class="timer-presets">
+      <button class="preset-btn" data-min="15">15m</button>
+      <button class="preset-btn active" data-min="30">30m</button>
+      <button class="preset-btn" data-min="45">45m</button>
+      <button class="preset-btn" data-min="60">60m</button>
+      <button class="preset-btn" data-min="0">∞</button>
+    </div>
+  </div>
+  <div class="timer-display">
+    <div class="timer-digits" id="timerDigits">30:00</div>
+  </div>
+  <div class="timer-bar-wrap">
+    <div class="timer-bar" id="timerBar"></div>
+  </div>
+</div>
+
+<!-- Mix -->
+<div class="mix-section">
+  <div class="section-label">Mix</div>
+  <div class="mix-controls">
+    <div class="mix-row">
+      <span class="mix-row-label">Tone</span>
+      <input type="range" id="toneVol" min="0" max="100" value="45">
+      <span class="mix-val" id="toneVolVal">45</span>
+    </div>
+    <div class="mix-row">
+      <span class="mix-row-label">Noise</span>
+      <input type="range" id="noiseVol" min="0" max="100" value="55">
+      <span class="mix-val" id="noiseVolVal">55</span>
+    </div>
+    <div class="mix-row">
+      <span class="mix-row-label">Type</span>
+      <div class="noise-types">
+        <button class="noise-type-btn" data-noise="pink">Pink</button>
+        <button class="noise-type-btn active" data-noise="brown">Brown</button>
+        <button class="noise-type-btn" data-noise="white">White</button>
+      </div>
+    </div>
+    <div class="mix-row">
+      <span class="mix-row-label">Carrier</span>
+      <input type="range" id="carrierFreq" min="80" max="300" value="200">
+      <span class="mix-val" id="carrierFreqVal">200</span>
+    </div>
+  </div>
+</div>
+
+<!-- Mode info -->
+<div class="mode-info" id="modeInfo">
+  <strong>Beta / Focus (16 Hz)</strong> — promotes alertness and active concentration.
+  Best for analytical tasks, writing, and detail work.
+</div>
+
+<div class="footer">No network required · All audio generated locally</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  AUDIO ENGINE
+// ─────────────────────────────────────────────
+const MODES = {
+  focus:    { beat: 16, label: 'Beta / Focus',    hz: '16 Hz', desc: 'promotes alertness and active concentration. Best for analytical tasks, writing, and detail work.' },
+  flow:     { beat: 10, label: 'Alpha / Flow',    hz: '10 Hz', desc: 'relaxed alertness, light creative focus. Good for brainstorming, reading, and moderate-intensity work.' },
+  relax:    { beat: 7,  label: 'Alpha-Theta / Relax', hz: '7 Hz', desc: 'the boundary between relaxed waking and light trance. Good for unwinding, gentle reflection.' },
+  sleep:    { beat: 2,  label: 'Delta / Sleep',   hz: '2 Hz',  desc: 'deep sleep and restoration range. Use to wind down before bed or for deep rest.' },
+  meditate: { beat: 5,  label: 'Theta / Meditate',hz: '5 Hz',  desc: 'deep meditation and light dream state. Supports inward focus, visualization, and contemplation.' },
+};
+
+let audioCtx = null;
+let isPlaying = false;
+let currentMode = 'focus';
+let noiseType = 'brown';
+let sessionMinutes = 30;
+let timerInterval = null;
+let timerRemaining = 0;
+let timerTotal = 0;
+
+// Gain nodes (live)
+let toneGainL = null, toneGainR = null, noiseGain = null;
+let masterGain = null;
+
+// Source nodes
+let oscL = null, oscR = null, noiseNode = null;
+let mergerNode = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// Brown noise buffer — pre-generate once
+function makeBrownNoiseBuffer(ctx) {
+  const bufferSize = ctx.sampleRate * 4;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let lastOut = 0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    data[i] = (lastOut + (0.02 * white)) / 1.02;
+    lastOut = data[i];
+    data[i] *= 3.5; // normalize
+  }
+  return buffer;
+}
+
+function makePinkNoiseBuffer(ctx) {
+  const bufferSize = ctx.sampleRate * 4;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+    b6 = white * 0.115926;
+  }
+  return buffer;
+}
+
+function makeWhiteNoiseBuffer(ctx) {
+  const bufferSize = ctx.sampleRate * 4;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+  return buffer;
+}
+
+function getNoiseBuffer(ctx) {
+  if (noiseType === 'pink') return makePinkNoiseBuffer(ctx);
+  if (noiseType === 'white') return makeWhiteNoiseBuffer(ctx);
+  return makeBrownNoiseBuffer(ctx);
+}
+
+function startAudio() {
+  const ctx = getAudioCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  masterGain = ctx.createGain();
+  masterGain.gain.value = 1.0;
+  masterGain.connect(ctx.destination);
+
+  // Binaural tone setup
+  const carrier = parseInt(document.getElementById('carrierFreq').value) || 200;
+  const beat = MODES[currentMode].beat;
+
+  mergerNode = ctx.createChannelMerger(2);
+  mergerNode.connect(masterGain);
+
+  // Left ear: carrier
+  oscL = ctx.createOscillator();
+  oscL.type = 'sine';
+  oscL.frequency.value = carrier;
+  toneGainL = ctx.createGain();
+  toneGainL.gain.value = getToneGain();
+  oscL.connect(toneGainL);
+  toneGainL.connect(mergerNode, 0, 0);
+  oscL.start();
+
+  // Right ear: carrier + beat
+  oscR = ctx.createOscillator();
+  oscR.type = 'sine';
+  oscR.frequency.value = carrier + beat;
+  toneGainR = ctx.createGain();
+  toneGainR.gain.value = getToneGain();
+  oscR.connect(toneGainR);
+  toneGainR.connect(mergerNode, 0, 1);
+  oscR.start();
+
+  // Noise — mono through splitter to both channels
+  const noiseBuf = getNoiseBuffer(ctx);
+  noiseNode = ctx.createBufferSource();
+  noiseNode.buffer = noiseBuf;
+  noiseNode.loop = true;
+  noiseGain = ctx.createGain();
+  noiseGain.gain.value = getNoiseGain();
+
+  // Spread mono noise to both channels
+  const splitter = ctx.createChannelSplitter(1);
+  const noiseMerger = ctx.createChannelMerger(2);
+  noiseNode.connect(noiseGain);
+  noiseGain.connect(noiseMerger, 0, 0);
+  noiseGain.connect(noiseMerger, 0, 1);
+  noiseMerger.connect(masterGain);
+  noiseNode.start();
+}
+
+function stopAudio() {
+  if (oscL)     { try { oscL.stop(); }     catch(e){} oscL = null; }
+  if (oscR)     { try { oscR.stop(); }     catch(e){} oscR = null; }
+  if (noiseNode){ try { noiseNode.stop(); } catch(e){} noiseNode = null; }
+  toneGainL = null; toneGainR = null; noiseGain = null;
+  masterGain = null; mergerNode = null;
+}
+
+function getToneGain() {
+  return parseInt(document.getElementById('toneVol').value) / 100 * 0.3;
+}
+
+function getNoiseGain() {
+  return parseInt(document.getElementById('noiseVol').value) / 100 * 0.5;
+}
+
+function updateToneGain() {
+  const g = getToneGain();
+  if (toneGainL) toneGainL.gain.value = g;
+  if (toneGainR) toneGainR.gain.value = g;
+}
+
+function updateNoiseGain() {
+  if (noiseGain) noiseGain.gain.value = getNoiseGain();
+}
+
+// Bowl strike end-of-session tone
+function playBowlCue() {
+  const ctx = getAudioCtx();
+  const g = ctx.createGain();
+  g.connect(ctx.destination);
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 432;
+  osc.connect(g);
+
+  const osc2 = ctx.createOscillator();
+  osc2.type = 'sine';
+  osc2.frequency.value = 864; // octave harmonic
+  const g2 = ctx.createGain();
+  g2.gain.value = 0.3;
+  osc2.connect(g2);
+  g2.connect(g);
+
+  const now = ctx.currentTime;
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.4, now + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 4.0);
+
+  osc.start(now);
+  osc2.start(now);
+  osc.stop(now + 4.5);
+  osc2.stop(now + 4.5);
+}
+
+// ─────────────────────────────────────────────
+//  TIMER
+// ─────────────────────────────────────────────
+function startTimer() {
+  clearInterval(timerInterval);
+  if (sessionMinutes === 0) {
+    timerRemaining = Infinity;
+    updateTimerDisplay();
+    return;
+  }
+  timerTotal = sessionMinutes * 60;
+  timerRemaining = timerTotal;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    if (!isPlaying) { clearInterval(timerInterval); return; }
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      playBowlCue();
+      setTimeout(() => togglePlay(), 4500);
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDigits');
+  const bar = document.getElementById('timerBar');
+
+  if (timerRemaining === Infinity || sessionMinutes === 0) {
+    el.textContent = '∞';
+    bar.style.width = '0%';
+    return;
+  }
+
+  const m = Math.floor(timerRemaining / 60);
+  const s = timerRemaining % 60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  if (isPlaying && timerTotal > 0) {
+    el.classList.add('counting');
+    const pct = ((timerTotal - timerRemaining) / timerTotal) * 100;
+    bar.style.width = pct + '%';
+  } else {
+    el.classList.remove('counting');
+    bar.style.width = '0%';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  TOGGLE PLAY
+// ─────────────────────────────────────────────
+function togglePlay() {
+  if (isPlaying) {
+    isPlaying = false;
+    stopAudio();
+    stopTimer();
+    document.body.classList.remove('playing');
+    document.getElementById('orbIcon').textContent = '▶';
+    document.getElementById('orbStatus').textContent = 'tap to begin';
+    document.getElementById('orbRing').classList.remove('pulse');
+    document.getElementById('orbRingOuter').classList.remove('pulse');
+    updateTimerDisplay();
+  } else {
+    isPlaying = true;
+    startAudio();
+    startTimer();
+    document.body.classList.add('playing');
+    document.getElementById('orbIcon').textContent = '■';
+    document.getElementById('orbStatus').textContent = MODES[currentMode].hz;
+    document.getElementById('orbRing').classList.add('pulse');
+    document.getElementById('orbRingOuter').classList.add('pulse');
+    updateModeColor();
+  }
+}
+
+function updateModeColor() {
+  const colors = {
+    focus: 'var(--c-focus)', flow: 'var(--c-flow)', relax: 'var(--c-relax)',
+    sleep: 'var(--c-sleep)', meditate: 'var(--c-meditate)'
+  };
+  const glows = {
+    focus:    'rgba(79,195,247,0.18)',
+    flow:     'rgba(129,199,132,0.18)',
+    relax:    'rgba(206,147,216,0.18)',
+    sleep:    'rgba(92,107,192,0.18)',
+    meditate: 'rgba(255,183,77,0.18)',
+  };
+  document.documentElement.style.setProperty('--accent', colors[currentMode]);
+  document.documentElement.style.setProperty('--glow', glows[currentMode]);
+}
+
+// ─────────────────────────────────────────────
+//  UI EVENTS
+// ─────────────────────────────────────────────
+document.getElementById('orbBtn').addEventListener('click', togglePlay);
+
+// Mode buttons
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    updateModeInfo();
+
+    if (isPlaying) {
+      // Hot-swap oscillator frequencies
+      if (oscL && oscR) {
+        const carrier = parseInt(document.getElementById('carrierFreq').value) || 200;
+        oscL.frequency.setTargetAtTime(carrier, audioCtx.currentTime, 0.1);
+        oscR.frequency.setTargetAtTime(carrier + MODES[currentMode].beat, audioCtx.currentTime, 0.1);
+      }
+      document.getElementById('orbStatus').textContent = MODES[currentMode].hz;
+      updateModeColor();
+    }
+  });
+});
+
+// Timer presets
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionMinutes = parseInt(btn.dataset.min);
+    if (!isPlaying) {
+      timerRemaining = sessionMinutes * 60;
+      updateTimerDisplay();
+    }
+  });
+});
+
+// Volume sliders
+document.getElementById('toneVol').addEventListener('input', function() {
+  document.getElementById('toneVolVal').textContent = this.value;
+  updateToneGain();
+});
+
+document.getElementById('noiseVol').addEventListener('input', function() {
+  document.getElementById('noiseVolVal').textContent = this.value;
+  updateNoiseGain();
+});
+
+document.getElementById('carrierFreq').addEventListener('input', function() {
+  document.getElementById('carrierFreqVal').textContent = this.value;
+  if (isPlaying && oscL && oscR) {
+    const carrier = parseInt(this.value);
+    oscL.frequency.setTargetAtTime(carrier, audioCtx.currentTime, 0.05);
+    oscR.frequency.setTargetAtTime(carrier + MODES[currentMode].beat, audioCtx.currentTime, 0.05);
+  }
+});
+
+// Noise type
+document.querySelectorAll('.noise-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.noise-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    noiseType = btn.dataset.noise;
+    if (isPlaying) {
+      // Rebuild noise source live
+      const ctx = getAudioCtx();
+      if (noiseNode) { try { noiseNode.stop(); } catch(e){} }
+      const noiseBuf = getNoiseBuffer(ctx);
+      noiseNode = ctx.createBufferSource();
+      noiseNode.buffer = noiseBuf;
+      noiseNode.loop = true;
+      if (noiseGain) {
+        noiseNode.connect(noiseGain);
+        const noiseMerger = ctx.createChannelMerger(2);
+        noiseGain.connect(noiseMerger, 0, 0);
+        noiseGain.connect(noiseMerger, 0, 1);
+        noiseMerger.connect(masterGain);
+      }
+      noiseNode.start();
+    }
+  });
+});
+
+// Mode info
+function updateModeInfo() {
+  const m = MODES[currentMode];
+  document.getElementById('modeInfo').innerHTML =
+    `<strong>${m.label} (${m.hz})</strong> — ${m.desc}`;
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(console.warn);
+}
+
+// Init timer display
+timerRemaining = sessionMinutes * 60;
+updateTimerDisplay();
+updateModeInfo();
+</script>
+</body>
+</html>
